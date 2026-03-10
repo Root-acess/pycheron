@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymlkit"
+version = "0.1.0"
+description = "A simple, powerful ML framework that automates the full training pipeline"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "pymlkit contributors" }]
+keywords = ["machine-learning", "automl", "scikit-learn", "data-science"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core dependencies — all optional extras degrade gracefully
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+    "joblib>=1.3",
+    "cloudpickle>=3.0",
+    "optuna>=3.4",
+    "shap>=0.44",
+    "rich>=13.0",
+    "pydantic>=2.0",
+    "tomli>=2.0; python_version < '3.11'",
+    "typing-extensions>=4.8",
+]
+
+[project.optional-dependencies]
+xgboost  = ["xgboost>=2.0"]
+lightgbm = ["lightgbm>=4.0"]
+torch    = ["torch>=2.0"]
+all      = ["pymlkit[xgboost,lightgbm,torch]"]
+dev      = [
+    "pytest>=7",
+    "pytest-cov",
+    "black",
+    "ruff",
+    "mypy",
+    "pre-commit",
+]
+
+[project.urls]
+"Homepage"    = "https://github.com/yourusername/pymlkit"
+"Bug Tracker" = "https://github.com/yourusername/pymlkit/issues"
+"Changelog"   = "https://github.com/yourusername/pymlkit/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["pymlkit*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "-v --tb=short"
+
+[tool.black]
+line-length    = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+select      = ["E", "F", "I", "N", "W"]
+
+[tool.mypy]
+python_version       = "3.9"
+strict               = false
+ignore_missing_imports = true

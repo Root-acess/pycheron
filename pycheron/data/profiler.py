@@ -1,9 +1,9 @@
 """
 pycheron.data.profiler — Statistical profiling of datasets.
 
-DataProfiler  : computes summary statistics used by the preprocessing
-                engine and algorithm recommendation system.
-DataProfile   : immutable result object holding all profile metrics.
+DataProfiler  : full profiler used internally by the trainer
+DataProfile   : result object
+QuickProfiler : fast human-readable profile (used by pycrn.data.profile())
 """
 
 from __future__ import annotations
@@ -22,26 +22,6 @@ logger = get_logger(__name__)
 class DataProfile:
     """
     Statistical snapshot of a dataset, used for intelligent ML decisions.
-
-    Attributes
-    ----------
-    n_rows          : number of rows
-    n_features      : number of feature columns (excludes target)
-    n_classes       : number of unique target values (None for regression)
-    class_balance   : min/max class ratio; 1.0 = perfectly balanced
-    feature_types   : dict mapping ColumnType → list of column names
-    missing_rates   : per-column missing value fraction
-    skewness        : per numeric column skewness
-    target_dtype    : pandas dtype string of the target column
-    data_hash       : MD5 fingerprint of the full DataFrame
-
-    Properties
-    ----------
-    is_large        : True when n_rows > 50,000
-    is_wide         : True when n_features > 100
-    is_imbalanced   : True when class_balance < 0.2
-    has_text        : True when TEXT columns are present
-    has_datetime    : True when DATETIME columns are present
     """
 
     def __init__(
@@ -66,31 +46,24 @@ class DataProfile:
         self.target_dtype = target_dtype
         self.data_hash = data_hash
 
-    # ── Convenience properties ────────────────────────────────────────────────
-
     @property
     def is_large(self) -> bool:
-        """True when dataset has more than 50,000 rows."""
         return self.n_rows > 50_000
 
     @property
     def is_wide(self) -> bool:
-        """True when dataset has more than 100 features."""
         return self.n_features > 100
 
     @property
     def is_imbalanced(self) -> bool:
-        """True when minority class is less than 20 % of the majority class."""
         return self.class_balance is not None and self.class_balance < 0.2
 
     @property
     def has_text(self) -> bool:
-        """True when at least one TEXT column is present."""
         return bool(self.feature_types.get(ColumnType.TEXT))
 
     @property
     def has_datetime(self) -> bool:
-        """True when at least one DATETIME column is present."""
         return bool(self.feature_types.get(ColumnType.DATETIME))
 
     def __repr__(self) -> str:
@@ -102,20 +75,7 @@ class DataProfile:
 
 
 class DataProfiler:
-    """
-    Generates a DataProfile from a validated DataFrame.
-
-    The profile drives two key downstream decisions:
-      1. Preprocessing strategy (scaler type, encoding method)
-      2. Algorithm recommendation scoring
-
-    Examples
-    --------
-    >>> profiler = DataProfiler()
-    >>> profile = profiler.profile(df, target="label", schema=schema)
-    >>> profile.is_large      # False
-    >>> profile.has_text      # False
-    """
+    """Full profiler used internally by the Trainer."""
 
     def profile(
         self,
@@ -123,22 +83,8 @@ class DataProfiler:
         target: str,
         schema: Dict,
     ) -> DataProfile:
-        """
-        Compute a full statistical profile of the dataset.
-
-        Parameters
-        ----------
-        df     : the raw DataFrame (before preprocessing)
-        target : name of the target column
-        schema : output of SchemaDetector.detect()
-
-        Returns
-        -------
-        DataProfile
-        """
         n_rows, n_cols = df.shape
 
-        # Group columns by type
         feature_types: Dict = {
             ctype: [
                 c for c, t in schema.items()
@@ -147,7 +93,6 @@ class DataProfiler:
             for ctype in ColumnType
         }
 
-        # Target statistics
         y = df[target]
         n_unique_target = int(y.nunique())
         n_classes: Optional[int] = (
@@ -160,7 +105,6 @@ class DataProfiler:
             counts = y.value_counts(normalize=True)
             class_balance = float(counts.min() / counts.max())
 
-        # Per-column skewness for numeric features
         numeric_cols: List[str] = feature_types.get(ColumnType.NUMERIC, [])
         skewness: Dict[str, float] = {}
         if numeric_cols:
@@ -177,3 +121,101 @@ class DataProfiler:
             target_dtype=str(y.dtype),
             data_hash=DataLoader.hash(df),
         )
+
+
+class QuickProfiler:
+    """
+    Fast, human-readable profile for pycrn.data.profile() and pycrn.pd.profile().
+
+    Returns a plain dict with summary stats per column.
+    """
+
+    def run(
+        self,
+        df: pd.DataFrame,
+        target: Optional[str] = None,
+    ) -> dict:
+        """
+        Compute a quick profile of a DataFrame.
+
+        Returns
+        -------
+        dict with keys: shape, columns, missing, dtypes, numeric_stats,
+                        target_info (if target given)
+        """
+        result: dict = {
+            "shape": df.shape,
+            "n_rows": len(df),
+            "n_columns": len(df.columns),
+            "total_missing": int(df.isnull().sum().sum()),
+            "duplicate_rows": int(df.duplicated().sum()),
+            "columns": {},
+        }
+
+        for col in df.columns:
+            s = df[col]
+            col_info: dict = {
+                "dtype": str(s.dtype),
+                "missing": int(s.isnull().sum()),
+                "missing_pct": round(s.isnull().mean() * 100, 2),
+                "unique": int(s.nunique()),
+            }
+            if pd.api.types.is_numeric_dtype(s):
+                col_info.update({
+                    "mean": round(float(s.mean()), 4),
+                    "std": round(float(s.std()), 4),
+                    "min": float(s.min()),
+                    "max": float(s.max()),
+                    "median": float(s.median()),
+                    "skew": round(float(s.skew()), 4),
+                })
+            else:
+                top = s.value_counts().head(3).to_dict()
+                col_info["top_values"] = top
+
+            result["columns"][col] = col_info
+
+        if target and target in df.columns:
+            y = df[target]
+            result["target"] = {
+                "name": target,
+                "dtype": str(y.dtype),
+                "unique_values": int(y.nunique()),
+                "distribution": y.value_counts().to_dict(),
+            }
+            if y.nunique() <= 20:
+                counts = y.value_counts(normalize=True)
+                result["target"]["class_balance"] = round(
+                    float(counts.min() / counts.max()), 4
+                )
+
+        # Display nicely with rich if available
+        try:
+            from rich.console import Console
+            from rich.table import Table
+            console = Console()
+            t = Table(title=f"Data Profile  ({df.shape[0]:,} rows × {df.shape[1]} cols)")
+            t.add_column("Column", style="cyan")
+            t.add_column("Dtype")
+            t.add_column("Missing %")
+            t.add_column("Unique")
+            t.add_column("Stats")
+            for col, info in result["columns"].items():
+                stats = ""
+                if "mean" in info:
+                    stats = f"mean={info['mean']:.4g}, std={info['std']:.4g}"
+                elif "top_values" in info:
+                    top_k = list(info["top_values"].keys())[:2]
+                    stats = f"top: {top_k}"
+                t.add_row(
+                    col,
+                    info["dtype"],
+                    f"{info['missing_pct']}%",
+                    str(info["unique"]),
+                    stats,
+                )
+            console.print(t)
+        except ImportError:
+            pass
+
+        return result

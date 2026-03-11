@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pymlkit"
+name = "pycheron"
 version = "0.1.0"
-description = "A simple, powerful ML framework that automates the full training pipeline"
+description = "pycheron: Python Deep Learning Toolkit for AutoML, preprocessing and model training"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "pymlkit contributors" }]
+authors = [{ name = "pycheron contributors" }]
 keywords = ["machine-learning", "automl", "scikit-learn", "data-science"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -43,7 +43,7 @@ dependencies = [
 xgboost  = ["xgboost>=2.0"]
 lightgbm = ["lightgbm>=4.0"]
 torch    = ["torch>=2.0"]
-all      = ["pymlkit[xgboost,lightgbm,torch]"]
+all      = ["pycheron[xgboost,lightgbm,torch]"]
 dev      = [
     "pytest>=7",
     "pytest-cov",
@@ -54,13 +54,13 @@ dev      = [
 ]
 
 [project.urls]
-"Homepage"    = "https://github.com/yourusername/pymlkit"
-"Bug Tracker" = "https://github.com/yourusername/pymlkit/issues"
-"Changelog"   = "https://github.com/yourusername/pymlkit/blob/main/CHANGELOG.md"
+"Homepage"    = "https://github.com/Root-acess/pycheron"
+"Bug Tracker" = "https://github.com/Root-acess/pycheron/issues"
+"Changelog"   = "https://github.com/Root-acess/pycheron/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where   = ["."]
-include = ["pymlkit*"]
+include = ["pycheron*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

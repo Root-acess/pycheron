@@ -13,11 +13,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import pymlkit
-from pymlkit.automl.auto_trainer import AutoTrainer
-from pymlkit.persistence.model_store import ModelStore
-from pymlkit.train.trainer import TaskDetector, Trainer
-from pymlkit.utils.types import TaskType
+import pycheron
+from pycheron.automl.auto_trainer import AutoTrainer
+from pycheron.persistence.model_store import ModelStore
+from pycheron.train.trainer import TaskDetector, Trainer
+from pycheron.utils.types import TaskType
 
 
 # ── TaskDetector ──────────────────────────────────────────────────────────────
@@ -132,25 +132,25 @@ class TestPersistence:
 
 class TestPublicAPI:
     def test_train(self, clf_df):
-        model = pymlkit.train(clf_df, target="label", algorithm="random_forest", verbose=0)
+        model = pycheron.train(clf_df, target="label", algorithm="random_forest", verbose=0)
         assert model is not None
 
     def test_auto_train(self, clf_df):
-        model = pymlkit.auto_train(clf_df, target="label", time_budget=20, n_candidates=2, verbose=0)
+        model = pycheron.auto_train(clf_df, target="label", time_budget=20, n_candidates=2, verbose=0)
         assert model is not None
 
     def test_train_with_save(self, clf_df, model_dir):
-        pymlkit.train(clf_df, target="label", algorithm="random_forest", verbose=0, save_path=model_dir)
+        pycheron.train(clf_df, target="label", algorithm="random_forest", verbose=0, save_path=model_dir)
         assert Path(model_dir).exists()
 
     def test_load_model(self, clf_df, model_dir):
-        pymlkit.train(clf_df, target="label", algorithm="random_forest", verbose=0, save_path=model_dir)
-        loaded = pymlkit.load_model(model_dir)
+        pycheron.train(clf_df, target="label", algorithm="random_forest", verbose=0, save_path=model_dir)
+        loaded = pycheron.load_model(model_dir)
         preds = loaded.predict(clf_df.drop(columns=["label"]))
         assert len(preds) == len(clf_df)
 
     def test_repr(self, clf_df):
-        model = pymlkit.train(clf_df, target="label", algorithm="random_forest", verbose=0)
+        model = pycheron.train(clf_df, target="label", algorithm="random_forest", verbose=0)
         r = repr(model)
         assert "TrainedModel" in r
         assert "random_forest" in r

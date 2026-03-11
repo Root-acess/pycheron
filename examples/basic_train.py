@@ -1,4 +1,4 @@
-import pymlkit
+import pycheron
 import pandas as pd
 import numpy as np
 
@@ -15,7 +15,7 @@ df = pd.DataFrame({
 print("Dataset shape:", df.shape)
 
 # Train model
-model = pymlkit.train(
+model = pycheron.train(
     df,
     target="target",
     verbose=2

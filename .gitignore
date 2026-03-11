@@ -45,8 +45,8 @@ dmypy.json
 *.swo
 .DS_Store
 
-# pymlkit runtime artefacts
-.pymlkit_cache/
+# pycheron runtime artefacts
+.pycheron_cache/
 *.pkl
 manifest.json
 latest.txt

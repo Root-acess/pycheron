@@ -1,5 +1,5 @@
 """
-tests/unit/test_data.py — Unit tests for pymlkit.data.*
+tests/unit/test_data.py — Unit tests for pycheron.data.*
 
 Covers:
   DataLoader  (loader.py)
@@ -13,10 +13,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pymlkit.data.loader import DataLoader
-from pymlkit.data.validator import SchemaDetector, DataValidator, ValidationReport
-from pymlkit.data.profiler import DataProfiler, DataProfile
-from pymlkit.utils.types import ColumnType
+from pycheron.data.loader import DataLoader
+from pycheron.data.validator import SchemaDetector, DataValidator, ValidationReport
+from pycheron.data.profiler import DataProfiler, DataProfile
+from pycheron.utils.types import ColumnType
 
 
 # ── DataLoader ────────────────────────────────────────────────────────────────

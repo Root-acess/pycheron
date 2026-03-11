@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to pymlkit will be documented here.
+All notable changes to pycheron will be documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -10,20 +10,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Planned
-- `pymlkit.tracking` — experiment tracking module
-- `pymlkit.plugins`  — third-party algorithm plugin system
-- `pymlkit.infer`    — WSGI-compatible model serving (`serve()`)
-- CLI entry point (`pymlkit train data.csv --target label`)
+- `pycheron.tracking` — experiment tracking module
+- `pycheron.plugins`  — third-party algorithm plugin system
+- `pycheron.infer`    — WSGI-compatible model serving (`serve()`)
+- CLI entry point (`pycheron train data.csv --target label`)
 
 ---
 
 ## [0.1.0] — 2026-03-11
 
 ### Added
-- `pymlkit.train()` — single-call training with auto algorithm selection
-- `pymlkit.auto_train()` — 3-stage AutoML tournament (sample → CV → tune)
-- `pymlkit.load_model()` — versioned model persistence via `ModelStore`
-- `pymlkit.explain()` — SHAP-based feature attribution
+- `pycheron.train()` — single-call training with auto algorithm selection
+- `pycheron.auto_train()` — 3-stage AutoML tournament (sample → CV → tune)
+- `pycheron.load_model()` — versioned model persistence via `ModelStore`
+- `pycheron.explain()` — SHAP-based feature attribution
 - `DataLoader` — CSV / Parquet / JSON / Excel / DataFrame input
 - `SchemaDetector` — automatic column type inference (8 types)
 - `DataValidator` — data quality checks with `ValidationReport`

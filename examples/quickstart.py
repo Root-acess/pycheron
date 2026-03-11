@@ -1,5 +1,5 @@
 """
-examples/quickstart.py — Getting started with pymlkit in 5 lines.
+examples/quickstart.py — Getting started with pycheron in 5 lines.
 
 Run:
     python examples/quickstart.py
@@ -7,7 +7,7 @@ Run:
 
 import numpy as np
 import pandas as pd
-import pymlkit
+import pycheron
 
 # ── 1. Create (or load) your data ────────────────────────────────────────────
 rng = np.random.RandomState(42)
@@ -22,7 +22,7 @@ df = pd.DataFrame({
 })
 
 # ── 2. Train — one line ───────────────────────────────────────────────────────
-model = pymlkit.train(df, target="purchased")
+model = pycheron.train(df, target="purchased")
 # Output: progress, CV score, final evaluation report
 
 # ── 3. Predict ────────────────────────────────────────────────────────────────
@@ -42,10 +42,10 @@ except ImportError:
 
 # ── 5. Save & reload ──────────────────────────────────────────────────────────
 model.save("./my_model")
-loaded = pymlkit.load_model("./my_model")
+loaded = pycheron.load_model("./my_model")
 print("\nLoaded model:", loaded)
 
 # ── 6. AutoML (optional) ──────────────────────────────────────────────────────
 print("\n--- AutoML ---")
-best_model = pymlkit.auto_train(df, target="purchased", time_budget=60)
+best_model = pycheron.auto_train(df, target="purchased", time_budget=60)
 best_model.leaderboard()

@@ -1,5 +1,5 @@
 """
-tests/unit/test_preprocess.py — Unit tests for pymlkit.preprocess.*
+tests/unit/test_preprocess.py — Unit tests for pycheron.preprocess.*
 
 Covers:
   detect_ordinal     (encoder.py)
@@ -13,12 +13,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pymlkit.data.profiler import DataProfiler
-from pymlkit.data.validator import DataValidator, SchemaDetector
-from pymlkit.preprocess.encoder import detect_ordinal, extract_datetime_features
-from pymlkit.preprocess.pipeline import Preprocessor
-from pymlkit.preprocess.scaler import choose_scaler, is_tree_based
-from pymlkit.utils.types import TaskType
+from pycheron.data.profiler import DataProfiler
+from pycheron.data.validator import DataValidator, SchemaDetector
+from pycheron.preprocess.encoder import detect_ordinal, extract_datetime_features
+from pycheron.preprocess.pipeline import Preprocessor
+from pycheron.preprocess.scaler import choose_scaler, is_tree_based
+from pycheron.utils.types import TaskType
 
 
 # ── encoder.py ────────────────────────────────────────────────────────────────
